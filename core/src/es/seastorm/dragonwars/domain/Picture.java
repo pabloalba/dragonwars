@@ -1,9 +1,26 @@
 package es.seastorm.dragonwars.domain;
 
-import com.badlogic.gdx.graphics.Texture;
 
 public class Picture extends Item {
-    public Picture(String image, Float x, Float y, Float angle){
-        super(image, x, y, angle);
+    protected String picture;
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
+
+
+    public Picture(String image, Float x, Float y){
+        super(image, x, y);
+        setPicture(image);
+    }
+
+    public Picture(String image, Integer id, Float x, Float y){
+        super(image, id, x, y);
+        setPicture(image);
     }
 }

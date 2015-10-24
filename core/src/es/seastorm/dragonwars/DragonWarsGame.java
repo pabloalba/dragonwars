@@ -15,6 +15,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import es.seastorm.dragonwars.screens.Screen;
+import es.seastorm.dragonwars.utils.CommonResources;
+import es.seastorm.dragonwars.utils.Translator;
 
 public class DragonWarsGame extends ApplicationAdapter {
     public static Integer SCREEN_X = 1536;
@@ -47,6 +49,7 @@ public class DragonWarsGame extends ApplicationAdapter {
     public void create() {
         System.out.println("Create...");
         dragonWarsEngine = new DragonWarsEngine(this);
+        CommonResources.reset();
 
         //camera = new OrthographicCamera();
         //camera.setToOrtho(false, SCREEN_X, );

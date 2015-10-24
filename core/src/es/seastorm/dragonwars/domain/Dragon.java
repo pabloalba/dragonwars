@@ -8,7 +8,7 @@ import java.util.Stack;
 
 import es.seastorm.dragonwars.DragonWarsGame;
 
-public class Dragon extends Item {
+public class Dragon extends SpriteItem {
     public Stack<Button> movementList = new Stack<Button>();
     Fire fire;
     boolean showFire;

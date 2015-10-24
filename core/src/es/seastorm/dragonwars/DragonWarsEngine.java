@@ -13,13 +13,17 @@ import es.seastorm.dragonwars.domain.Button;
 import es.seastorm.dragonwars.domain.Dragon;
 import es.seastorm.dragonwars.domain.Item;
 import es.seastorm.dragonwars.domain.Picture;
+import es.seastorm.dragonwars.domain.Text;
 import es.seastorm.dragonwars.screens.ButtonsScreen;
 import es.seastorm.dragonwars.screens.DragonsScreen;
+import es.seastorm.dragonwars.screens.MenuScreen;
 import es.seastorm.dragonwars.screens.MovementButtonsScreen;
 import es.seastorm.dragonwars.screens.PopupInfoDragonScreen;
 import es.seastorm.dragonwars.screens.PopupSettingsScreen;
 import es.seastorm.dragonwars.screens.Screen;
 import es.seastorm.dragonwars.screens.SplashScreen;
+import es.seastorm.dragonwars.utils.ItemsIds;
+import es.seastorm.dragonwars.utils.Translator;
 
 public class DragonWarsEngine {
     public final int MODE_SELECT_MOVE_NUM = 0;
@@ -31,10 +35,12 @@ public class DragonWarsEngine {
     public final int MODE_POPUP_INFO_DRAGON = 6;
     public final int MODE_POPUP_SETTINGS = 7;
     public final int MODE_SPLASH = 8;
+    public final int MODE_MENU = 9;
 
     ButtonsScreen buttonsScreen;
     DragonsScreen dragonsScreen;
-    SplashScreen splashScreen;
+    SplashScreen splashScreen = new SplashScreen();
+    MenuScreen menuScreen = new MenuScreen();
     MovementButtonsScreen movementButtonsScreen;
     PopupInfoDragonScreen popupInfoDragonScreen;
     PopupSettingsScreen popupSettingsScreen = new PopupSettingsScreen();
@@ -54,7 +60,6 @@ public class DragonWarsEngine {
     public DragonWarsEngine(DragonWarsGame game) {
         this.game = game;
         this.time = System.currentTimeMillis();
-        this.splashScreen = new SplashScreen();
     }
 
     private void startMusic() {
@@ -84,7 +89,9 @@ public class DragonWarsEngine {
 
 
     public void touch(float x, float y) {
-        if (mode == MODE_SELECT_MOVE_NUM) {
+        if (mode == MODE_MENU) {
+            _touchOnModeMenu(x, y);
+        } else if (mode == MODE_SELECT_MOVE_NUM) {
             _touchOnModeMoveNum(x, y);
         } else if (mode == MODE_SELECT_MOVE) {
             _touchOnModeMove(x, y);
@@ -111,11 +118,20 @@ public class DragonWarsEngine {
     }
 
 
+    private void _touchOnModeMenu(float x, float y) {
+        Picture picture = (Picture) Utils.touchedSprite(menuScreen.items, x, y);
+        if (picture != null) {
+            if (picture.id == ItemsIds.MENU_ONE_PLAYER) {
+                resetGame();
+            }
+        }
+    }
+
+
     private void _touchOnModeMoveNum(float x, float y) {
         Button button = (Button) Utils.touchedSprite(buttonsScreen.items, x, y);
 
         if (button != null) {
-            System.out.println("" + button);
             if (button.getPicture().equals(ButtonsScreen.OK)) {
                 _moveReady();
             } else if (button.getPicture().equals(ButtonsScreen.GEAR)) {
@@ -153,7 +169,6 @@ public class DragonWarsEngine {
         Picture button = (Picture) Utils.touchedSprite(popupSettingsScreen.items, x, y);
 
         if (button != null) {
-            System.out.println(button.getPicture());
             if (button.getPicture().equals(PopupSettingsScreen.SOUND_ON)) {
                 startMusic();
             } else if (button.getPicture().equals(PopupSettingsScreen.SOUND_OFF)) {
@@ -178,7 +193,6 @@ public class DragonWarsEngine {
     }
 
     private void _touchOnModeMove(float x, float y) {
-        System.out.println("_touchOnModeMove");
         Button button = (Button) Utils.touchedSprite(movementButtonsScreen.items, x, y);
         if (button != null) {
             buttonsScreen.addMovementButton(numMove, button.clone());
@@ -196,7 +210,6 @@ public class DragonWarsEngine {
     }
 
     public void _endDragonsMove() {
-        System.out.println("_endDragonsMove");
         buttonsScreen.resetMovementButtons();
         mode = MODE_SELECT_MOVE_NUM;
     }
@@ -206,6 +219,7 @@ public class DragonWarsEngine {
         if (screensByMode == null) {
             screensByMode = new HashMap<Integer, Screen[]>();
             screensByMode.put(MODE_SPLASH, new Screen[]{splashScreen});
+            screensByMode.put(MODE_MENU, new Screen[]{menuScreen});
             screensByMode.put(MODE_SELECT_MOVE_NUM, new Screen[]{dragonsScreen, buttonsScreen});
             screensByMode.put(MODE_SELECT_MOVE, new Screen[]{dragonsScreen, movementButtonsScreen});
             screensByMode.put(MODE_POPUP_INFO_DRAGON, new Screen[]{dragonsScreen, buttonsScreen, popupInfoDragonScreen});
@@ -214,7 +228,6 @@ public class DragonWarsEngine {
         }
 
         if (screensByMode.containsKey(mode)) {
-            System.out.println(mode);
             return screensByMode.get(mode);
         } else {
             return screensByMode.get(-1);
@@ -222,8 +235,6 @@ public class DragonWarsEngine {
     }
 
     private void _moveReady() {
-        System.out.println("_moveReady");
-
         Button button1 = (Button) buttonsScreen.items.get(0);
         Button button2 = (Button) buttonsScreen.items.get(1);
         Button button3 = (Button) buttonsScreen.items.get(2);
@@ -260,9 +271,9 @@ public class DragonWarsEngine {
     public void checkChangeMode() {
         if (mode == MODE_SPLASH) {
             if ((System.currentTimeMillis() - time) > 3000) {
-                resetGame();
+                startModeMenu();
             }
-        }else if (mode == MODE_MOVE_READY) {
+        } else if (mode == MODE_MOVE_READY) {
             //With two players, wait for second player moves
             startModeMovingDragons();
         } else if (mode == MODE_MOVING_DRAGONS) {
@@ -281,8 +292,11 @@ public class DragonWarsEngine {
         }
     }
 
+    private void startModeMenu(){
+        mode = MODE_MENU;
+    }
+
     public void startModeMovingDragons() {
-        System.out.println("startModeMovingDragons");
         if (((Dragon) dragonsScreen.items.get(0)).movementList.size() > 0) {
             for (int i = 0; i < dragonsScreen.items.size; i++) {
                 Dragon dragon = (Dragon) dragonsScreen.items.get(i);

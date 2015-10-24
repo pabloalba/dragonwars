@@ -4,7 +4,7 @@ package es.seastorm.dragonwars.domain;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Button extends Item {
+public class Button extends SpriteItem {
 
     public float incX;
     public float incRadius;
