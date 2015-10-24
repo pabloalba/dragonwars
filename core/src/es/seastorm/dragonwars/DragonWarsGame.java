@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -100,10 +101,11 @@ public class DragonWarsGame extends ApplicationAdapter {
         Long time = System.currentTimeMillis();
         if (time - lastClickTime > 200) {
             lastClickTime = time;
-            //debug = Gdx.input.getX() + "       /        " + Gdx.input.getY();
+
             touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(touchPos);
+            touchPos = viewport.unproject(touchPos);
             dragonWarsEngine.touch(touchPos.x, touchPos.y);
+
         }
     }
 
